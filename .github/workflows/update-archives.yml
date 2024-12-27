@@ -1,0 +1,48 @@
+name: Update Archives on HTML File Change
+
+on:
+  push:
+    branches:
+      - main # 監聽主要分支的推送事件
+
+jobs:
+  update-archives:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get changed HTML files
+        id: get_html_files
+        run: |
+          # 獲取最近的提交中新增或刪除的 HTML 檔案，排除 index.html
+          ADDED_FILES=$(git diff --name-status HEAD^ HEAD | grep '^A' | grep '\.html | grep -v 'index.html' | awk '{print \$2}')
+          DELETED_FILES=$(git diff --name-status HEAD^ HEAD | grep '^D' | grep '\.html | awk '{print \$2}')
+          echo "added_files=$ADDED_FILES" >> $GITHUB_ENV
+          echo "deleted_files=$DELETED_FILES" >> $GITHUB_ENV
+
+      - name: Update index.html
+        run: |
+          # 更新 index.html 中的 archives 列表
+          if [ -n "$added_files" ]; then
+            for file in $added_files; do
+              # 將每個新增的 HTML 檔案連結添加到 archives 的 ul 中
+              echo "<li><a href=\"$file\">$(basename "$file")</a></li>" >> index.html
+            done
+          fi
+
+          if [ -n "$deleted_files" ]; then
+            for file in $deleted_files; do
+              # 從 archives 的 ul 中移除已刪除的檔案連結
+              sed -i "/<a href=\"$file\">$(basename "$file")<\/a>/d" index.html
+            done
+          fi
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add index.html
+          git commit -m "Update archives in index.html" || echo "No changes to commit"
+          git push
