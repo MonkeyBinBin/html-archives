@@ -31,18 +31,20 @@ jobs:
 
       - name: Update index.html
         run: |
-          # 更新 index.html 中的 archives 列表
+          # 更新 index.html 中的列表
           if [ -n "$added_files" ]; then
             for file in $added_files; do
-              # 將每個新增的 HTML 檔案連結添加到 archives 的 ul 中
-              sed -i "/<ul class=\"link-list\">/a <li><a href=\"$file\">$(basename "$file")</a></li>" index.html
+              # 將每個新增的 HTML 檔案連結添加到 link-list 的 ul 中
+              sed -i "/<ul class=\"link-list\">/a\\
+              <li><a href=\"$file\">$(basename "$file")</a></li>\\
+              " index.html
             done
           fi
 
           if [ -n "$deleted_files" ]; then
             for file in $deleted_files; do
               # 從 archives 的 ul 中移除已刪除的檔案連結
-              sed -E -i "/<ul class=\"link-list\">/,/<\/ul>/s|<li><a href=\"$file\">$(basename "$file")</a></li>||" index.html
+              sed -i -E "/<ul class=\"link-list\">/,/<\/ul>/s|<li><a href=\"$file\">$(basename "$file")</a></li>||" index.html
             done
           fi
 
