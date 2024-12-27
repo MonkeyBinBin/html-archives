@@ -17,8 +17,8 @@ jobs:
         id: get_html_files
         run: |
           # 獲取最近的提交中新增或刪除的 HTML 檔案，排除 index.html
-          ADDED_FILES=$(git diff --name-status HEAD^ HEAD | grep '^A' | grep '\.html' | grep -v 'index.html' | awk '{print $2}' || echo "")
-          DELETED_FILES=$(git diff --name-status HEAD^ HEAD | grep '^D' | grep '\.html' | awk '{print $2}' || echo "")
+          ADDED_FILES=$(git diff --name-status HEAD^ HEAD | grep '^A' | grep '\.html' | grep -v 'index.html' | awk '{$1=""; print substr($0,2)}' || echo "")
+          DELETED_FILES=$(git diff --name-status HEAD^ HEAD | grep '^D' | grep '\.html' | awk '{$1=""; print substr($0,2)}' || echo "")
           echo "added_files=$ADDED_FILES" >> $GITHUB_ENV
           echo "deleted_files=$DELETED_FILES" >> $GITHUB_ENV
 
