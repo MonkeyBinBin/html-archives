@@ -42,7 +42,7 @@ jobs:
           if [ -n "$deleted_files" ]; then
             for file in $deleted_files; do
               # 從 archives 的 ul 中移除已刪除的檔案連結
-              sed -i "/<ul class=\"link-list\">/,/<\/ul>/s|<li><a href=\"$file\">$(basename "$file")</a></li>||" index.html
+              sed -E -i "/<ul class=\"link-list\">/,/<\/ul>/s|<li><a href=\"$file\">$(basename "$file")</a></li>||" index.html
             done
           fi
 
