@@ -14,6 +14,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # 設定 Git 配置
+      - name: Set up git
+        run: |
+          git config core.quotepath false
+          git config i18n.commitEncoding utf-8
+          git config i18n.logOutputEncoding utf-8
+
       # 確保完整的提交記錄
       - name: Fetch full git history
         run: git fetch --depth=2 || true
